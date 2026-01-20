@@ -1,8 +1,0 @@
-package rules;
-
-rule "Regla de prueba"
-when
-    String( this == "Hola Drools" )
-then
-    System.out.println("¡Se disparó la regla de prueba!");
-end

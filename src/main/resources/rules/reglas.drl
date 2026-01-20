@@ -1,0 +1,313 @@
+package rules;
+import com.val.drools.SituacionAgricola;
+dialect "java"
+
+// ==========================================
+// SECCIÓN 1: ENMIENDA Y FERTILIZACIÓN
+// ==========================================
+
+rule "R1: Aplicar cal en maiz con pH bajo"
+    no-loop true
+when
+    $s : SituacionAgricola(
+            cultivo == "MAIZ",
+            ph_suelo == "BAJO",
+            enmienda_suelo == "NINGUNA"
+        )
+then
+    $s.setEnmienda_suelo("CAL");
+    update($s);
+end
+
+rule "R5: Fertilizacion necesaria"
+    no-loop true
+when
+    $s : SituacionAgricola(
+            nutrientes == "BAJOS",
+            fertilizacion != "NECESARIA"
+        )
+then
+    $s.setFertilizacion("NECESARIA");
+    update($s);
+end
+
+rule "R6: Fertilizacion no necesaria"
+    no-loop true
+when
+    $s : SituacionAgricola(
+            (nutrientes == "ADECUADOS" || nutrientes == "ALTOS"),
+            fertilizacion != "NO_NECESARIA"
+        )
+then
+    $s.setFertilizacion("NO_NECESARIA");
+    update($s);
+end
+
+// ==========================================
+// SECCIÓN 2: CONTROL DE PLAGAS
+// ==========================================
+
+rule "R2: Pesticida en hortalizas"
+    no-loop true
+when
+    $s : SituacionAgricola(
+            cultivo == "HORTALIZAS",
+            plaga == "INSECTOS",
+            control_plaga == "NINGUNO"
+        )
+then
+    $s.setControl_plaga("PESTICIDA");
+    update($s);
+end
+
+rule "R4: Fungicida preventivo en frutales"
+    no-loop true
+when
+    $s : SituacionAgricola(
+            cultivo == "FRUTALES",
+            humedad_amb == "ALTA",
+            control_plaga == "NINGUNO"
+        )
+then
+    $s.setControl_plaga("FUNGICIDA");
+    update($s);
+end
+
+rule "R7: Herbicida para malezas"
+    no-loop true
+when
+    $s : SituacionAgricola(
+            plaga == "MALEZAS",
+            control_plaga == "NINGUNO"
+        )
+then
+    $s.setControl_plaga("HERBICIDA");
+    $s.setManejo("ROTACION_PREVENTIVO");
+    update($s);
+end
+
+rule "R8: Fungicida por hongos"
+    no-loop true
+when
+    $s : SituacionAgricola(
+            plaga == "HONGOS",
+            control_plaga == "NINGUNO"
+        )
+then
+    $s.setControl_plaga("FUNGICIDA");
+    update($s);
+end
+
+rule "R9: Insecticida general"
+    no-loop true
+when
+    $s : SituacionAgricola(
+            plaga == "INSECTOS",
+            cultivo != "HORTALIZAS",
+            control_plaga == "NINGUNO"
+        )
+then
+    $s.setControl_plaga("INSECTICIDA");
+    update($s);
+end
+
+// ==========================================
+// SECCIÓN 3: RIEGO Y SEGURIDAD
+// ==========================================
+
+rule "R3: Aumentar frecuencia por calor"
+    no-loop true
+when
+    $s : SituacionAgricola(
+            temperatura == "ALTA",
+            humedad_suelo == "BAJA",
+            riego != "MANTENER"
+        )
+then
+    // Solo subir si no está bloqueado por fungicida
+    $s.setRiego("AUMENTAR_FRECUENCIA");
+    update($s);
+end
+
+rule "R10: Aumentar caudal por sequia"
+    no-loop true
+when
+    $s : SituacionAgricola(
+            precipitaciones == "BAJAS",
+            humedad_suelo == "BAJA",
+            riego != "MANTENER"
+        )
+then
+    $s.setRiego("AUMENTAR_CAUDAL");
+    update($s);
+end
+
+rule "R20: Bloqueo de Riego por Fungicida"
+    salience 1000
+    no-loop true
+when
+    $s : SituacionAgricola(
+            control_plaga == "FUNGICIDA",
+            riego != "MANTENER"
+        )
+then
+    $s.setRiego("MANTENER");
+    update($s);
+end
+
+// ==========================================
+// SECCIÓN 4: DIAGNÓSTICO DE RIESGO
+// ==========================================
+
+// Nota: Se adopta una política de “escala ascendente”:
+// ALTO > MEDIO > BAJO. Por eso las reglas evitan bajar riesgo.
+
+rule "R11: Riesgo Medio por Historial Alto"
+    no-loop true
+when
+    $s : SituacionAgricola(
+            historial_plagas == "ALTO",
+            plaga == "NINGUNA",
+            riesgo != "ALTO"  // no pisar riesgo alto
+        )
+then
+    $s.setRiesgo("MEDIO");
+    update($s);
+end
+
+rule "R12: Riesgo Alto"
+    no-loop true
+when
+    $s : SituacionAgricola(
+            plaga != "NINGUNA",
+            (historial_plagas == "ALTO" || historial_plagas == "MEDIO"),
+            riesgo != "ALTO"
+        )
+then
+    $s.setRiesgo("ALTO");
+    update($s);
+end
+
+rule "R13: Riesgo Medio por Historial Medio"
+    no-loop true
+when
+    $s : SituacionAgricola(
+            historial_plagas == "MEDIO",
+            plaga == "NINGUNA",
+            riesgo != "ALTO"
+        )
+then
+    $s.setRiesgo("MEDIO");
+    update($s);
+end
+
+rule "R14: Riesgo Bajo"
+    no-loop true
+when
+    $s : SituacionAgricola(
+            historial_plagas == "BAJO",
+            plaga == "NINGUNA",
+            riesgo != "BAJO"
+        )
+then
+    $s.setRiesgo("BAJO");
+    update($s);
+end
+
+rule "R15: Riesgo Medio por Plaga con Historial Bajo"
+    no-loop true
+when
+    $s : SituacionAgricola(
+            plaga != "NINGUNA",
+            historial_plagas == "BAJO",
+            riesgo == "BAJO"  // solo eleva de BAJO a MEDIO
+        )
+then
+    $s.setRiesgo("MEDIO");
+    update($s);
+end
+
+// ==========================================
+// SECCIÓN 5: ESTRATEGIA DE MANEJO
+// Jerarquía: INTEGRADO > PREVENTIVO > CONVENCIONAL
+// ==========================================
+
+// 1. NIVEL MÁXIMO: MANEJO INTEGRADO
+// (Se dispara si el riesgo es alto, sin importar nada más)
+rule "R16: Manejo Integrado por Riesgo Alto"
+    salience 1000 // Prioridad máxima en manejo
+    no-loop true
+when
+    $s : SituacionAgricola(
+            riesgo == "ALTO",
+            manejo != "INTEGRADO"
+        )
+then
+    $s.setManejo("INTEGRADO");
+    update($s);
+end
+
+// 2. NIVEL MEDIO: PREVENTIVO (Por Riesgo Medio)
+// (Solo aplica si no estamos ya en Integrado)
+rule "R17: Manejo Preventivo por Riesgo Medio"
+    salience 10
+    no-loop true
+when
+    $s : SituacionAgricola(
+            riesgo == "MEDIO",
+            manejo != "INTEGRADO",
+            manejo != "PREVENTIVO"
+        )
+then
+    $s.setManejo("PREVENTIVO");
+    update($s);
+end
+
+// 3. NIVEL MEDIO: PREVENTIVO (Por Enmienda de Cal - Excepción)
+// (Sube a Preventivo, pero respeta si ya estaba en Integrado)
+rule "R19: Manejo Preventivo por Cal"
+    salience 500
+    no-loop true
+when
+    $s : SituacionAgricola(
+            enmienda_suelo == "CAL",
+            manejo != "INTEGRADO",
+            manejo != "PREVENTIVO"
+        )
+then
+    $s.setManejo("PREVENTIVO");
+    update($s);
+end
+
+// 4. NIVEL BASE: CONVENCIONAL (Fallback)
+// (Solo aplica si no hay ninguna razón para estar más arriba)
+rule "R18: Manejo Convencional por Riesgo Bajo"
+    salience 0
+    no-loop true
+when
+    $s : SituacionAgricola(
+            riesgo == "BAJO",
+            manejo != "INTEGRADO",
+            manejo != "PREVENTIVO",
+            manejo != "CONVENCIONAL"
+        )
+then
+    $s.setManejo("CONVENCIONAL");
+    update($s);
+end
+
+// ==========================================
+// SECCIÓN 6: ALERTAS CRÍTICAS
+// ==========================================
+
+rule "R21: Alerta por condiciones fuera de rango"
+    no-loop true
+when
+    $s : SituacionAgricola(
+            (ph_suelo == "ALTO" || (humedad_amb == "ALTA" && cultivo != "FRUTALES")),
+            alerta != "SI"
+        )
+then
+    $s.setAlerta("SI");
+    update($s);
+end
