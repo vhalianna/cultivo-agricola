@@ -82,7 +82,8 @@ when
         )
 then
     $s.setControl_plaga("HERBICIDA");
-    $s.setManejo("ROTACION_PREVENTIVO");
+    // CORRECCIÓN: Usamos un valor válido de la jerarquía para que R18 no lo pise
+    $s.setManejo("PREVENTIVO");
     update($s);
 end
 
