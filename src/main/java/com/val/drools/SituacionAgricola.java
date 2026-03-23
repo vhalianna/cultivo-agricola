@@ -76,6 +76,7 @@ public class SituacionAgricola {
     private String riesgo = BAJO;
     private String manejo = CONVENCIONAL;
     private String alerta = NO;
+    private java.util.List<ReglaEjecutada> reglasDisparadas = new java.util.ArrayList<>();
 
     public SituacionAgricola() {
         // Constructor vacío requerido/recomendado para Drools
@@ -240,6 +241,14 @@ public class SituacionAgricola {
 
     public void setAlerta(String alerta) {
         this.alerta = norm(alerta);
+    }
+
+    public java.util.List<ReglaEjecutada> getReglasDisparadas() {
+        return reglasDisparadas;
+    }
+
+    public void setReglasDisparadas(java.util.List<ReglaEjecutada> reglasDisparadas) {
+        this.reglasDisparadas = reglasDisparadas;
     }
 
     // =========================================================

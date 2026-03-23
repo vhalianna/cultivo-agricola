@@ -24,7 +24,8 @@ rule "R5: Fertilizacion necesaria"
 when
     $s : SituacionAgricola(
             nutrientes == "BAJOS",
-            fertilizacion != "NECESARIA"
+            fertilizacion != "NECESARIA",
+            precipitaciones != "ALTAS" // <--- AGREGAR ESTO
         )
 then
     $s.setFertilizacion("NECESARIA");
@@ -82,8 +83,10 @@ when
         )
 then
     $s.setControl_plaga("HERBICIDA");
-    // CORRECCIÓN: Usamos un valor válido de la jerarquía para que R18 no lo pise
-    $s.setManejo("PREVENTIVO");
+    // AGREGAR ESTE IF:
+    if (!"INTEGRADO".equals($s.getManejo())) {
+        $s.setManejo("PREVENTIVO");
+    }
     update($s);
 end
 
@@ -122,10 +125,9 @@ when
     $s : SituacionAgricola(
             temperatura == "ALTA",
             humedad_suelo == "BAJA",
-            riego != "MANTENER"
+            riego == "NORMAL"
         )
 then
-    // Solo subir si no está bloqueado por fungicida
     $s.setRiego("AUMENTAR_FRECUENCIA");
     update($s);
 end
@@ -136,19 +138,23 @@ when
     $s : SituacionAgricola(
             precipitaciones == "BAJAS",
             humedad_suelo == "BAJA",
-            riego != "MANTENER"
+            riego == "NORMAL"
         )
 then
     $s.setRiego("AUMENTAR_CAUDAL");
     update($s);
 end
 
-rule "R20: Bloqueo de Riego por Fungicida"
+rule "R20: Bloqueo de Riego por Aplicacion Quimica"
     salience 1000
     no-loop true
 when
     $s : SituacionAgricola(
-            control_plaga == "FUNGICIDA",
+            // AHORA PROTEGEMOS TODOS LOS QUÍMICOS:
+            (control_plaga == "FUNGICIDA" ||
+             control_plaga == "HERBICIDA" ||
+             control_plaga == "INSECTICIDA" ||
+             control_plaga == "PESTICIDA"),
             riego != "MANTENER"
         )
 then
@@ -160,16 +166,13 @@ end
 // SECCIÓN 4: DIAGNÓSTICO DE RIESGO
 // ==========================================
 
-// Nota: Se adopta una política de “escala ascendente”:
-// ALTO > MEDIO > BAJO. Por eso las reglas evitan bajar riesgo.
-
 rule "R11: Riesgo Medio por Historial Alto"
     no-loop true
 when
     $s : SituacionAgricola(
             historial_plagas == "ALTO",
             plaga == "NINGUNA",
-            riesgo != "ALTO"  // no pisar riesgo alto
+            riesgo != "ALTO"
         )
 then
     $s.setRiesgo("MEDIO");
@@ -208,7 +211,11 @@ when
     $s : SituacionAgricola(
             historial_plagas == "BAJO",
             plaga == "NINGUNA",
-            riesgo != "BAJO"
+            riesgo != "BAJO",
+            // AGREGAR ESTAS 3 LINEAS (Son las condiciones de la R25 negadas):
+            ph_suelo != "BAJO",
+            ph_suelo != "ALTO",
+            nutrientes != "BAJOS"
         )
 then
     $s.setRiesgo("BAJO");
@@ -221,7 +228,7 @@ when
     $s : SituacionAgricola(
             plaga != "NINGUNA",
             historial_plagas == "BAJO",
-            riesgo == "BAJO"  // solo eleva de BAJO a MEDIO
+            riesgo == "BAJO"
         )
 then
     $s.setRiesgo("MEDIO");
@@ -230,13 +237,10 @@ end
 
 // ==========================================
 // SECCIÓN 5: ESTRATEGIA DE MANEJO
-// Jerarquía: INTEGRADO > PREVENTIVO > CONVENCIONAL
 // ==========================================
 
-// 1. NIVEL MÁXIMO: MANEJO INTEGRADO
-// (Se dispara si el riesgo es alto, sin importar nada más)
 rule "R16: Manejo Integrado por Riesgo Alto"
-    salience 1000 // Prioridad máxima en manejo
+    salience 1000
     no-loop true
 when
     $s : SituacionAgricola(
@@ -248,8 +252,6 @@ then
     update($s);
 end
 
-// 2. NIVEL MEDIO: PREVENTIVO (Por Riesgo Medio)
-// (Solo aplica si no estamos ya en Integrado)
 rule "R17: Manejo Preventivo por Riesgo Medio"
     salience 10
     no-loop true
@@ -264,8 +266,6 @@ then
     update($s);
 end
 
-// 3. NIVEL MEDIO: PREVENTIVO (Por Enmienda de Cal - Excepción)
-// (Sube a Preventivo, pero respeta si ya estaba en Integrado)
 rule "R19: Manejo Preventivo por Cal"
     salience 500
     no-loop true
@@ -280,8 +280,6 @@ then
     update($s);
 end
 
-// 4. NIVEL BASE: CONVENCIONAL (Fallback)
-// (Solo aplica si no hay ninguna razón para estar más arriba)
 rule "R18: Manejo Convencional por Riesgo Bajo"
     salience 0
     no-loop true
@@ -298,7 +296,7 @@ then
 end
 
 // ==========================================
-// SECCIÓN 6: ALERTAS CRÍTICAS
+// SECCIÓN 6: ALERTAS Y CONFLICTOS
 // ==========================================
 
 rule "R21: Alerta por condiciones fuera de rango"
@@ -310,5 +308,67 @@ when
         )
 then
     $s.setAlerta("SI");
+    update($s);
+end
+
+// R22: CONSERVADA - Resuelve conflicto físico (Frío vs Agua)
+rule "R22: Bloqueo de Riego por Baja Temperatura"
+    salience 2000
+    no-loop true
+when
+    $s : SituacionAgricola(
+            temperatura == "BAJA",
+            riego != "DISMINUIR"
+        )
+then
+    $s.setRiego("DISMINUIR");
+    update($s);
+end
+
+// R23: CONSERVADA - Resuelve conflicto operativo (Frío vs Químico)
+rule "R23: Prohibir Aplicacion de Quimicos por Frio"
+    salience 2000
+    no-loop true
+when
+    $s : SituacionAgricola(
+            temperatura == "BAJA",
+            control_plaga != "NINGUNO",
+            control_plaga != "MONITOREO"
+        )
+then
+    $s.setControl_plaga("MONITOREO");
+    update($s);
+end
+
+// R24: CONSERVADA - Resuelve conflicto ambiental (Lluvia vs Químico)
+rule "R24: Posponer Quimicos por Lluvia"
+    salience 2000
+    no-loop true
+when
+    $s : SituacionAgricola(
+            precipitaciones == "ALTAS",
+            control_plaga != "NINGUNO",
+            control_plaga != "MONITOREO"
+        )
+then
+    $s.setControl_plaga("MONITOREO");
+    update($s);
+end
+
+// R25: CONSERVADA - Resuelve conflicto de jerarquía (Abiótico vs Biótico)
+// Nota: Quitamos la parte de pH ALTO si querías ser estricto,
+// pero es mejor dejarla para diagnosticar RIESGO ALTO aunque no tengamos cura.
+rule "R25: Riesgo Alto por Colapso Abiotico"
+    salience 500
+    no-loop true
+when
+    $s : SituacionAgricola(
+            plaga == "NINGUNA",
+            riesgo == "BAJO",
+            (ph_suelo == "BAJO" || ph_suelo == "ALTO" || nutrientes == "BAJOS")
+        )
+then
+    $s.setRiesgo("ALTO");
+    $s.setManejo("INTEGRADO");
     update($s);
 end

@@ -1,5 +1,6 @@
 package com.val.drools;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,9 +14,13 @@ public class AgricolaController {
 
     @PostMapping("/diagnosticar")
     public SituacionAgricola diagnosticar(@RequestBody SituacionAgricola situacion) {
-        System.out.println("Recibiendo solicitud desde Angular...");
-        System.out.println("Datos: " + situacion.getCultivo() + " | " + situacion.getPlaga());
-
         return droolsService.evaluar(situacion);
+    }
+
+    // --- AGREGA ESTE BLOQUE NUEVO ---
+    @PostMapping("/diagnosticar-lote")
+    public List<SituacionAgricola> diagnosticarLote(@RequestBody List<SituacionAgricola> lote) {
+        System.out.println("Recibiendo lote de " + lote.size() + " casos...");
+        return droolsService.evaluarLote(lote);
     }
 }

@@ -1,5 +1,11 @@
+export interface ReglaEjecutada {
+  orden: number;
+  nombre: string;
+  salience: number;
+}
+
 export class SituacionAgricola {
-  // Entradas (Valores por defecto IGUALES al Java)
+  // Entradas
   cultivo: string = 'MAIZ';
   ph_suelo: string = 'NORMAL';
   temperatura: string = 'MEDIA';
@@ -10,7 +16,7 @@ export class SituacionAgricola {
   nutrientes: string = 'ADECUADOS';
   historial_plagas: string = 'BAJO';
 
-  // Salidas (Opcionales porque vienen null al principio)
+  // Salidas
   enmienda_suelo?: string;
   control_plaga?: string;
   riego?: string;
@@ -18,4 +24,7 @@ export class SituacionAgricola {
   riesgo?: string;
   manejo?: string;
   alerta?: string;
+
+  // Reglas disparadas
+  reglasDisparadas?: ReglaEjecutada[];
 }

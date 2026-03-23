@@ -167,8 +167,118 @@
           <div class="mt-4 pt-3 border-top text-center">
             <span class="badge bg-secondary me-2">Fertilización: {{ resultado.fertilizacion }}</span>
           </div>
+          <div class="mt-4 pt-3 border-top" *ngIf="resultado.reglasDisparadas?.length">
+            <h6 class="text-secondary text-uppercase small fw-bold mb-3">Reglas Disparadas</h6>
 
+            <div class="d-flex flex-wrap gap-2">
+              <div *ngFor="let regla of resultado.reglasDisparadas" class="small">
+                <span class="badge bg-dark me-1">#{{ regla.orden }}</span>
+                <span class="badge bg-primary me-1">{{ regla.nombre }}</span>
+                <span *ngIf="regla.salience !== 0"
+                      class="badge"
+                      [ngClass]="getClaseSalience(regla.salience)">
+      S={{ regla.salience }}
+    </span>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+    </div>
+  </div>
+  <hr class="my-5">
+
+  <div class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="text-primary fw-bold">🧪 Laboratorio de Pruebas (QA)</h3>
+        <p class="text-muted">Ejecución automática de los {{ escenariosPrueba.length }} escenarios de control.</p>
+      </div>
+      <button class="btn btn-outline-primary btn-lg" (click)="ejecutarLote()" [disabled]="loadingBatch">
+        <span *ngIf="loadingBatch" class="spinner-border spinner-border-sm me-2"></span>
+        {{ loadingBatch ? 'Procesando...' : 'Ejecutar ' + escenariosPrueba.length + ' Escenarios' }}
+      </button>
+    </div>
+
+    <div class="card shadow-sm" *ngIf="mostrarTabla">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light">
+          <tr>
+            <th>#</th>
+            <th>Escenario (Input)</th>
+            <th>Control Plaga</th>
+            <th>Riego</th>
+            <th>Riesgo</th>
+            <th>Manejo</th>
+            <th>Alertas</th>
+            <th>Reglas</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let caso of resultadosLote; let i = index">
+            <td class="fw-bold text-muted">{{ i + 1 }}</td>
+
+            <td>
+              <div class="fw-bold">{{ caso.cultivo }}</div>
+              <small class="text-muted d-block">
+                pH: {{ caso.ph_suelo }} | Temp: {{ caso.temperatura }} | Hum. Suelo: {{ caso.humedad_suelo }}
+              </small>
+              <small class="text-muted d-block">
+                Hum. Amb: {{ caso.humedad_amb }} | Lluvias: {{ caso.precipitaciones }} | Nutrientes: {{ caso.nutrientes }}
+              </small>
+              <small class="text-muted d-block">
+                Plaga: {{ caso.plaga }} | Historial: {{ caso.historial_plagas }}
+              </small>
+              <small class="text-success">✔ Entrada completa del sistema</small>
+            </td>
+
+            <td class="fw-bold text-primary">{{ caso.control_plaga }}</td>
+
+            <td>
+              <span *ngIf="caso.control_plaga === 'FUNGICIDA' && caso.riego === 'MANTENER'"
+                    class="badge bg-success" title="Bloqueo R20 Activo">
+                <i class="bi bi-shield-lock-fill"></i> BLOQUEADO
+              </span>
+              <span *ngIf="!(caso.control_plaga === 'FUNGICIDA' && caso.riego === 'MANTENER')">
+                {{ caso.riego }}
+              </span>
+            </td>
+
+            <td>
+              <span class="badge"
+                    [class.bg-success]="caso.riesgo === 'BAJO'"
+                    [class.bg-warning]="caso.riesgo === 'MEDIO'"
+                    [class.bg-danger]="caso.riesgo === 'ALTO'">
+                {{ caso.riesgo }}
+              </span>
+            </td>
+
+            <td>
+              <span class="badge text-dark bg-light border">
+                {{ caso.manejo }}
+              </span>
+            </td>
+
+            <td>
+              <span *ngIf="caso.alerta === 'SI'" class="text-danger fw-bold">⚠️ SÍ</span>
+              <span *ngIf="caso.alerta !== 'SI'" class="text-muted opacity-25">NO</span>
+            </td>
+
+            <td class="col-reglas">
+              <div *ngFor="let regla of caso.reglasDisparadas" class="small mb-1">
+                <span class="badge bg-dark me-1">#{{ regla.orden }}</span>
+                <span class="badge bg-primary me-1">{{ regla.nombre }}</span>
+                <span *ngIf="regla.salience !== 0"
+                      class="badge"
+                      [ngClass]="getClaseSalience(regla.salience)">
+      S={{ regla.salience }}
+    </span>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
