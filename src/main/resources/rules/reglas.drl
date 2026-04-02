@@ -25,7 +25,7 @@ when
     $s : SituacionAgricola(
             nutrientes == "BAJOS",
             fertilizacion != "NECESARIA",
-            precipitaciones != "ALTAS" // <--- AGREGAR ESTO
+            precipitaciones != "ALTAS"
         )
 then
     $s.setFertilizacion("NECESARIA");
@@ -150,7 +150,6 @@ rule "R20: Bloqueo de Riego por Aplicacion Quimica"
     no-loop true
 when
     $s : SituacionAgricola(
-            // AHORA PROTEGEMOS TODOS LOS QUÍMICOS:
             (control_plaga == "FUNGICIDA" ||
              control_plaga == "HERBICIDA" ||
              control_plaga == "INSECTICIDA" ||
@@ -212,7 +211,7 @@ when
             historial_plagas == "BAJO",
             plaga == "NINGUNA",
             riesgo != "BAJO",
-            // AGREGAR ESTAS 3 LINEAS (Son las condiciones de la R25 negadas):
+            // Son las condiciones de la R25 negadas:
             ph_suelo != "BAJO",
             ph_suelo != "ALTO",
             nutrientes != "BAJOS"
@@ -311,7 +310,7 @@ then
     update($s);
 end
 
-// R22: CONSERVADA - Resuelve conflicto físico (Frío vs Agua)
+// Resuelve conflicto físico (Frío vs Agua)
 rule "R22: Bloqueo de Riego por Baja Temperatura"
     salience 2000
     no-loop true
@@ -325,7 +324,7 @@ then
     update($s);
 end
 
-// R23: CONSERVADA - Resuelve conflicto operativo (Frío vs Químico)
+// R23: Resuelve conflicto operativo (Frío vs Químico)
 rule "R23: Prohibir Aplicacion de Quimicos por Frio"
     salience 2000
     no-loop true
@@ -340,7 +339,7 @@ then
     update($s);
 end
 
-// R24: CONSERVADA - Resuelve conflicto ambiental (Lluvia vs Químico)
+// R24: Resuelve conflicto ambiental (Lluvia vs Químico)
 rule "R24: Posponer Quimicos por Lluvia"
     salience 2000
     no-loop true
@@ -355,9 +354,7 @@ then
     update($s);
 end
 
-// R25: CONSERVADA - Resuelve conflicto de jerarquía (Abiótico vs Biótico)
-// Nota: Quitamos la parte de pH ALTO si querías ser estricto,
-// pero es mejor dejarla para diagnosticar RIESGO ALTO aunque no tengamos cura.
+// R25: Resuelve conflicto de jerarquía
 rule "R25: Riesgo Alto por Colapso Abiotico"
     salience 500
     no-loop true

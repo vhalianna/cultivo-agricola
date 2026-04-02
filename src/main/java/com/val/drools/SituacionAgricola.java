@@ -3,7 +3,7 @@ package com.val.drools;
 public class SituacionAgricola {
 
     // =========================================================
-    // Constantes (evitan typos y unifican vocabulario del dominio)
+    // Constantes
     // =========================================================
 
     // Valores comunes
@@ -79,11 +79,11 @@ public class SituacionAgricola {
     private java.util.List<ReglaEjecutada> reglasDisparadas = new java.util.ArrayList<>();
 
     public SituacionAgricola() {
-        // Constructor vacío requerido/recomendado para Drools
+        
     }
 
     // =========================================================
-    // Normalización (evita que "maiz", " MAIZ " rompan las reglas)
+    // Normalización
     // =========================================================
     private static String norm(String v) {
         if (v == null) return null;
@@ -91,10 +91,6 @@ public class SituacionAgricola {
         return out.isEmpty() ? null : out.toUpperCase();
     }
 
-    /**
-     * Opcional: si cargás valores desde UI/archivo y querés asegurarte que
-     * todo quede en mayúsculas sin espacios antes de insertar en la sesión.
-     */
     public void normalizarEntradas() {
         this.cultivo = norm(this.cultivo);
         this.ph_suelo = norm(this.ph_suelo);
@@ -108,7 +104,7 @@ public class SituacionAgricola {
     }
 
     // =========================================================
-    // Getters y Setters - ENTRADA
+    // Getters y Setters
     // =========================================================
     public String getCultivo() {
         return cultivo;
@@ -183,16 +179,14 @@ public class SituacionAgricola {
     }
 
     // =========================================================
-    // Getters y Setters - SALIDA
+    // Getters y Setters
     // =========================================================
     public String getEnmienda_suelo() {
         return enmienda_suelo;
     }
 
     public void setEnmienda_suelo(String enmienda_suelo) {
-        // salida: no normalizo a la fuerza por si en el futuro agregás códigos,
-        // pero dejo consistencia de mayúsculas igual.
-        this.enmienda_suelo = norm(enmienda_suelo);
+          this.enmienda_suelo = norm(enmienda_suelo);
     }
 
     public String getControl_plaga() {

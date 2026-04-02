@@ -21,12 +21,6 @@
   transition: all 0.25s ease;
 }
 
-/* 🔥 Hover general: se activan */
-.columna-reglas:hover .regla-badge {
-  opacity: 1;
-  filter: grayscale(0%);
-}
-
 /* 🔥 Hover individual */
 .regla-badge:hover {
   transform: scale(1.05);
@@ -72,17 +66,6 @@
   background: #ffb300;
   color: black;
   font-weight: bold;
-}
-
-/* ESTADO BASE (grisado) */
-.col-reglas {
-  filter: grayscale(100%) opacity(0.6);
-  transition: all 0.25s ease;
-}
-
-/* HOVER → vuelve a color normal */
-.col-reglas:hover {
-  filter: grayscale(0%) opacity(1);
 }
 
 /* ESTADO BASE (grisado) */

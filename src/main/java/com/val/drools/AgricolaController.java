@@ -17,7 +17,6 @@ public class AgricolaController {
         return droolsService.evaluar(situacion);
     }
 
-    // --- AGREGA ESTE BLOQUE NUEVO ---
     @PostMapping("/diagnosticar-lote")
     public List<SituacionAgricola> diagnosticarLote(@RequestBody List<SituacionAgricola> lote) {
         System.out.println("Recibiendo lote de " + lote.size() + " casos...");
