@@ -194,12 +194,6 @@ Esto permite construir un sistema **explicable, modular y extensible**.
 
 ---
 
-## 📸 Capturas (opcional)
-
-*Agregar aquí imágenes del sistema en funcionamiento*
-
----
-
 ## 📚 Ayuda adicional
 
 ```bash
