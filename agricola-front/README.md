@@ -1,27 +1,224 @@
-# AgricolaFront
+# 🌱 Sistema Experto de Asesoría Agrícola
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.17.
+![Angular](https://img.shields.io/badge/Angular-17-red)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-Backend-green)
+![Drools](https://img.shields.io/badge/Drools-Rule%20Engine-orange)
+![Status](https://img.shields.io/badge/Estado-En%20desarrollo-yellow)
+![UNPA](https://img.shields.io/badge/UNPA-UARG-blue)
+![Materia](https://img.shields.io/badge/Materia-Programación%20Lógica%20y%20Funcional-purple)
 
-## Development server
+---
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## 📌 Descripción del proyecto
 
-## Code scaffolding
+Este proyecto consiste en el desarrollo de un **sistema experto basado en reglas**, orientado a la asesoría agrícola, implementado en el marco de la asignatura **Programación Lógica y Funcional (2025)**.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+El sistema modela conocimiento agronómico mediante reglas declarativas, permitiendo **automatizar la toma de decisiones** a partir de variables del entorno, simulando el razonamiento de un especialista.
 
-## Build
+---
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## 🧠 ¿Qué hace el sistema?
 
-## Running unit tests
+A partir de una situación agrícola ingresada por el usuario, el sistema analiza variables como:
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+* Tipo de cultivo
+* pH del suelo
+* Temperatura
+* Humedad del suelo y ambiente
+* Precipitaciones
+* Presencia de plagas
+* Nivel de nutrientes
+* Historial de plagas
 
-## Running end-to-end tests
+Y genera un diagnóstico que incluye:
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+* 🌡️ Nivel de riesgo
+* 🌱 Manejo recomendado
+* 💧 Acciones de riego
+* 🐛 Control de plagas
+* 🌿 Fertilización
+* 🧪 Enmienda del suelo
+* ⚠️ Alertas
 
-## Further help
+---
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## 🔍 Transparencia del razonamiento
+
+El sistema permite visualizar:
+
+* ✔️ Reglas ejecutadas
+* 🔢 Orden de ejecución
+* ⚡ Prioridad de reglas (salience)
+
+Esto facilita la **interpretabilidad del modelo**, característica clave en sistemas expertos.
+
+---
+
+## 🏗️ Arquitectura del sistema
+
+El sistema está diseñado bajo una arquitectura desacoplada en tres capas:
+
+* 🎨 **Frontend:** Angular
+* ⚙️ **Backend:** Spring Boot (API REST)
+* 🧠 **Motor de reglas:** Drools
+
+### ✅ Ventajas
+
+* Separación de responsabilidades
+* Escalabilidad
+* Mantenibilidad
+* Flexibilidad para evolución del sistema
+
+---
+
+## ⚙️ Tecnologías utilizadas
+
+* Angular 17.3.17
+* TypeScript
+* Bootstrap
+* Java
+* Spring Boot
+* Drools (Rule Engine)
+
+---
+
+## 🚀 Ejecución del proyecto
+
+### 📌 Frontend
+
+```bash
+ng serve
+```
+
+Abrir en navegador:
+
+```
+http://localhost:4200/
+```
+
+---
+
+### 📌 Backend
+
+(Ejecutar desde el proyecto Spring Boot)
+
+```bash
+mvn spring-boot:run
+```
+
+---
+
+## 🧩 Generación de componentes (Angular)
+
+```bash
+ng generate component nombre-componente
+```
+
+Otros:
+
+```bash
+ng generate directive|pipe|service|class|guard|interface|enum|module
+```
+
+---
+
+## 🏗️ Build del proyecto
+
+```bash
+ng build
+```
+
+Salida en:
+
+```
+dist/
+```
+
+---
+
+## 🧪 Pruebas
+
+### Tests unitarios
+
+```bash
+ng test
+```
+
+### Tests end-to-end
+
+```bash
+ng e2e
+```
+
+⚠️ Requiere configuración previa de herramienta e2e.
+
+---
+
+## 📊 Funcionalidades principales
+
+* ✔️ Consulta individual de escenarios agrícolas
+* 🧪 Laboratorio de simulación de escenarios
+* 📋 Visualización de reglas ejecutadas
+* ⚡ Identificación de prioridades (salience)
+* 🎨 Interfaz visual con codificación por colores
+
+---
+
+## 🧠 Modelo de conocimiento
+
+El sistema se basa en un conjunto de reglas definidas en Drools, donde:
+
+* Las condiciones representan estados del entorno
+* Las acciones definen recomendaciones
+* Las prioridades (salience) controlan la ejecución
+
+Esto permite construir un sistema **explicable, modular y extensible**.
+
+---
+
+## ⚠️ Consideraciones
+
+* El comportamiento del sistema depende directamente de la base de reglas
+* Es fundamental mantener coherencia entre reglas para evitar conflictos
+* El orden de ejecución influye en el resultado final
+
+---
+
+## 🔮 Posibles mejoras
+
+* 🤖 Incorporación de técnicas de IA (Machine Learning)
+* 🌐 Integración con APIs climáticas
+* 📊 Visualización avanzada de datos
+* ⚡ Optimización del motor de inferencia
+* 📱 Adaptación a dispositivos móviles
+
+---
+
+## 📸 Capturas (opcional)
+
+*Agregar aquí imágenes del sistema en funcionamiento*
+
+---
+
+## 📚 Ayuda adicional
+
+```bash
+ng help
+```
+
+O visitar:
+
+👉 https://angular.io/cli
+
+---
+
+## 👩‍💻 Autor
+
+**Valeria Eliana Ojeda Muñoz**
+Universidad Nacional de la Patagonia Austral (UNPA) – UARG
+
+---
+
+## 📄 Licencia
+
+Este proyecto es de uso académico.
